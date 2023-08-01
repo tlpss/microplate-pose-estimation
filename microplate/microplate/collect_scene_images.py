@@ -1,7 +1,9 @@
+import datetime
+import json
 from airo_robots.manipulators.hardware.ur_rtde import URrtde
 from airo_camera_toolkit.cameras.realsense import Realsense
 from airo_spatial_algebra.se3 import SE3Container
-from airo_dataset_tools.data_parsers.pose import Pose
+from airo_dataset_tools.data_parsers.pose import EulerAngles, Pose, Position
 import numpy as np
 import cv2
 from microplate.opencv_annotation import get_manual_annotations, Annotation
@@ -18,7 +20,7 @@ if __name__ == "__main__":
 
     target_position = np.array([0.34,-0.01,0.0]) # approximate center of the microplate
 
-    for z  in np.arange(0.3,0.31,0.05):
+    for z  in np.arange(0.2,0.31,0.05):
         # avoid self-collision while moving from one half to other.
         robot.move_linear_to_tcp_pose(home_pose,0.1).wait()
 
@@ -50,6 +52,19 @@ if __name__ == "__main__":
                 robot.move_linear_to_tcp_pose(tcp_pose,0.05).wait()
                 image = camera.get_rgb_image()
                 image = ImageConverter.from_numpy_format(image).image_in_opencv_format
-                cv2.imwrite("scene_images/scene_{}_{}_{}.png".format(x,y,z),image)
+                image_name = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+
+                cv2.imwrite(f"scene_images/{image_name}.png",image)
+                
+                pose_se3 = SE3Container.from_homogeneous_matrix(camera_pose)
+                x, y, z = pose_se3.translation
+                roll, pitch, yaw = pose_se3.orientation_as_euler_angles
+
+                pose_saveable = Pose(
+                    position_in_meters=Position(x=x, y=y, z=z),
+                    rotation_euler_xyz_in_radians=EulerAngles(roll=roll, pitch=pitch, yaw=yaw),
+                )
+                with open(f"scene_images/{image_name}_camera_pose.json", "w") as f:
+                    json.dump(pose_saveable.dict(), f, indent=4)
 
 

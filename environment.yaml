@@ -12,6 +12,12 @@ dependencies:
   - pip:
     - numpy
     - matplotlib
+    - pyrealsense2
+    - -e microplate/
+    - -e airo-mono/airo-typing
+    - -e airo-mono/airo-camera-toolkit/
+    - -e airo-mono/airo-robots/
+    - -e airo-mono/airo-dataset-tools/
+    - -e airo-mono/airo-spatial-algebra/
     - pytest
     - pre-commit
-    - -e microplate/

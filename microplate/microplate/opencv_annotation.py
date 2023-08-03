@@ -283,6 +283,72 @@ def get_manual_annotations(camera: Camera, annotation_spec: dict[str, Annotation
             cv2.destroyAllWindows()
             return annotations
 
+def get_manual_annotations_image(float_image, annotation_spec: dict[str, Annotation]) -> dict:
+    current_mouse_point = [(0, 0)]  # has to be a list so that the callback can edit it
+    clicked_points = []
+
+    def mouse_callback(event, x, y, flags, parm):
+        if event == cv2.EVENT_LBUTTONDOWN:
+            clicked_points.append((x, y))
+        elif event == cv2.EVENT_MOUSEMOVE:
+            current_mouse_point[0] = x, y
+
+    window_name = "Annotation window"
+    cv2.namedWindow(window_name, cv2.WINDOW_NORMAL)
+    cv2.setMouseCallback(window_name, mouse_callback)
+
+    annotation_names = list(annotation_spec.keys())
+    annotation_types = list(annotation_spec.values())
+    num_annotations = len(annotation_names)
+    annotations = {}
+    current_id = 0
+
+    while True:
+        image = ImageConverter.from_numpy_format(float_image).image_in_opencv_format
+
+        if current_id >= num_annotations:
+            banner_text = "All annotations collected. Press 'Enter' to confirm."
+            cv2.putText(
+                image,
+                banner_text,
+                (10, 30),
+                cv2.FONT_HERSHEY_SIMPLEX,
+                1,
+                (0, 255, 0),
+                2,
+            )
+        else:
+            # Process and draw
+            current_name = annotation_names[current_id]
+            current_type = annotation_types[current_id]
+
+            clicked_points, annotation = process_clicked_points(current_type, clicked_points)
+
+            if annotation is not None:
+                annotations[current_name] = annotation
+                current_id += 1
+
+            image = visualize_current_annotation(
+                image,
+                current_name,
+                current_type,
+                current_mouse_point[0],
+                clicked_points,
+            )
+
+        image = visualize_finished_annotations(image, annotations, annotation_spec)
+
+        cv2.imshow(window_name, image)
+        key = cv2.waitKey(10)
+
+        if key == ord("q"):
+            cv2.destroyAllWindows()
+            return None
+
+        # Enter key
+        if key == 13 and current_id >= num_annotations:
+            cv2.destroyAllWindows()
+            return annotations
 
 if __name__ == "__main__":
     import pprint

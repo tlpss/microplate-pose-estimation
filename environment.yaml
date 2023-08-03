@@ -5,10 +5,14 @@
 # to update: conda env update -f environment.yaml
 name: microplate
 channels:
+  - pytorch
+  - nvidia
   - conda-forge
 dependencies:
   - python=3.10
   - pip
+  - pytorch=1.13
+  - pytorch-cuda=11.7
   - pip:
     - numpy
     - matplotlib
@@ -19,5 +23,7 @@ dependencies:
     - -e airo-mono/airo-robots/
     - -e airo-mono/airo-dataset-tools/
     - -e airo-mono/airo-spatial-algebra/
+    - wandb
+    - -e keypoint-detection/
     - pytest
     - pre-commit

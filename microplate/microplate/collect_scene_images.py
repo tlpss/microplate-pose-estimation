@@ -66,5 +66,6 @@ if __name__ == "__main__":
                 )
                 with open(f"scene_images/{image_name}_camera_pose.json", "w") as f:
                     json.dump(pose_saveable.dict(), f, indent=4)
+                np.save(f"scene_images/{image_name}_camera_intrinsics.npy",camera.intrinsics_matrix())
 
 

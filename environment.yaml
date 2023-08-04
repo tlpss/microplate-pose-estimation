@@ -17,6 +17,7 @@ dependencies:
     - numpy
     - matplotlib
     - pyrealsense2
+    - ipykernel
     - -e microplate/
     - -e airo-mono/airo-typing
     - -e airo-mono/airo-camera-toolkit/

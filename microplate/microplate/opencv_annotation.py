@@ -283,6 +283,7 @@ def get_manual_annotations(camera: Camera, annotation_spec: dict[str, Annotation
             cv2.destroyAllWindows()
             return annotations
 
+
 def get_manual_annotations_image(float_image, annotation_spec: dict[str, Annotation]) -> dict:
     current_mouse_point = [(0, 0)]  # has to be a list so that the callback can edit it
     clicked_points = []
@@ -350,12 +351,13 @@ def get_manual_annotations_image(float_image, annotation_spec: dict[str, Annotat
             cv2.destroyAllWindows()
             return annotations
 
+
 if __name__ == "__main__":
     import pprint
 
     from airo_camera_toolkit.cameras.realsense import Realsense
 
-    camera = Realsense(resolution=Realsense.RESOLUTION_720,fps =10)
+    camera = Realsense(resolution=Realsense.RESOLUTION_720, fps=10)
     annotation_spec = {
         "keypoint": Annotation.Keypoint,
         "line_segment": Annotation.LineSegment,
